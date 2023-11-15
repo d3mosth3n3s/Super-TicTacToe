@@ -150,18 +150,33 @@ int main() {
     printGrid(vectorGrid);
 
     int userRow, userColumn;
-    int inner, outer;
+    int inner, outer, userInput;
     char symbol;
+
+    int moveCounter = 0;
 
     while (true)
     {
         cout << endl;
-        cout << "Enter outer: ";
-        cin >> outer;
-        cout << "Enter inner: ";
-        cin >> inner;
-        cout << "Enter symbol ('X' or 'O'): ";
-        cin >> symbol;
+        cout << "Enter your move (eg. 41): ";
+        cin >> userInput;
+
+        string userStr = to_string(userInput);
+
+        inner = userStr[1] - '0';
+        outer = userStr[0] - '0';
+
+        if (moveCounter % 2 == 0) 
+        {
+            symbol = 'X'; 
+        } 
+
+        else 
+        {
+            symbol = 'O'; 
+        }
+
+        moveCounter++;
 
         userRow = getActualY(outer,inner);
         userColumn = getActualX(outer,inner);
