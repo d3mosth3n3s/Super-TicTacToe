@@ -83,7 +83,6 @@ int getActualX(int outer, int inner)
     }
 
     return x;
-
 }
 
 int getActualY(int outer, int inner)
@@ -150,18 +149,48 @@ int main() {
     printGrid(vectorGrid);
 
     int userRow, userColumn;
-    int inner, outer;
+    int inner, outer, userInput;
     char symbol;
+
+    int moveCounter = 0;
+    int prevSecondDigit = -1;
 
     while (true)
     {
         cout << endl;
-        cout << "Enter outer: ";
-        cin >> outer;
-        cout << "Enter inner: ";
-        cin >> inner;
-        cout << "Enter symbol ('X' or 'O'): ";
-        cin >> symbol;
+        cout << "Enter your move (eg. 41): ";
+        cin >> userInput;
+
+        int userCoordinate = userInput;
+        int firstDigit = userCoordinate / 10;
+        int secondDigit = userCoordinate % 10;
+
+        if (firstDigit == 0 || secondDigit == 0 || userInput > 99 || userInput < 11) 
+        {
+            cout << "The coordinate you entered is out of range. Please enter the right coordinate. " << endl;
+            continue;
+        }
+
+        inner = secondDigit;
+        outer = firstDigit;
+
+        if (prevSecondDigit != -1 && prevSecondDigit != outer) 
+        {
+            cout << "Invalid move. Your move must be in grid " << prevSecondDigit << endl;
+            continue;
+        }
+
+        if (moveCounter % 2 == 0) 
+        {
+            symbol = 'X'; 
+        } 
+
+        else 
+        {
+            symbol = 'O'; 
+        }
+
+        moveCounter++;
 
         userRow = getActualY(outer,inner);
         userColumn = getActualX(outer,inner);
@@ -211,6 +240,8 @@ int main() {
 
         cout << endl;
         printGrid(vectorGrid);
+
+        prevSecondDigit = inner;
     }
     
     return 0;
