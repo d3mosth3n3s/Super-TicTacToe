@@ -116,7 +116,35 @@ int getActualY(int outer, int inner)
     return y;
 }
 
+bool checkWinG1(const vector<string> &grid, char symbol)
+{
+    for (int i = 1; i <= 5; i += 2)
+    {
+        if (grid[i][1] == symbol && grid[i][5] == symbol && grid[i][9] == symbol)
+        {
+            return true;
+        }
+    }
+
+    for (int i = 1; i <= 9; i += 4)
+    {
+        if (grid[1][i] == symbol && grid[3][i] == symbol && grid[5][i] == symbol)
+        {
+            return true;
+        }
+    }
+    
+    if ((grid[1][1] == symbol && grid[3][5] == symbol && grid[5][9] == symbol) ||
+        (grid[5][1] == symbol && grid[3][5] == symbol && grid[1][9] == symbol))   
+    {
+        return true;
+    }
+
+    return false;
+}
+
 int main() {
+
     vector<string> vectorGrid = {
         "            |             |            ",
         "   |   |    |    |   |    |    |   |   ",
@@ -240,6 +268,11 @@ int main() {
 
         cout << endl;
         printGrid(vectorGrid);
+
+        if (checkWinG1(vectorGrid, symbol))
+        {
+            cout << "Player " << symbol << " wins the first grid!" << endl;
+        }
 
         prevSecondDigit = inner;
     }
