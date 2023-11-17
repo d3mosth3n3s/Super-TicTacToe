@@ -11,26 +11,26 @@ void printGrid(const vector<string> &grid)
     }
 }
 
-int getY(int n)
+int getY (int n)
 {
-    if(n >= 1 && n <= 3)
+    if (n >= 1 && n <= 3)
     {
         return 0;
     }
 
-    if(n >= 4 && n <= 6)
+    if (n >= 4 && n <= 6)
     {
         return 1;
     }
 
-    if(n >= 7 && n <= 9)
+    if (n >= 7 && n <= 9)
     {
         return 2;
     }
 
 }
 
-int getX(int n)
+int getX (int n)
 {
     // 1 4 7 >>> 0 ;mod 3 = 1
     // 2 5 8 >>> 1 ;mod 3 = 2
@@ -57,6 +57,7 @@ int getActualX(int outer, int inner)
     // 1 -> 3
 
     int ref, x = 0;
+    
     switch (getX(outer)) {
         case 0:
             ref = 0;
@@ -71,13 +72,13 @@ int getActualX(int outer, int inner)
 
     x = ref + inner;
 
-    if(inner > 6)
+    if (inner > 6)
     {
         // cout << inner << " is more than 6 \n";
         x -= 6;
     } 
     
-    else if(inner > 3)
+    else if (inner > 3)
     {
         x -= 3;
     }
@@ -103,39 +104,51 @@ int getActualY(int outer, int inner)
 
     y = ref;
 
-    if(inner > 6)
+    if (inner > 6)
     {
         y += 2;
     } 
     
-    else if(inner > 3)
+    else if (inner > 3)
     {
         y += 1;
     }
 
     return y;
 }
-
-bool checkWinG1(const vector<string> &grid, char symbol)
+bool checkWin(const vector<string> &grid, char symbol, int subgrid)
 {
-    for (int i = 1; i <= 5; i += 2)
+    int horizontal[9] = {1, 5, 9, 15, 19, 23, 29, 33, 37};
+    int vertical[9] = {1, 3, 5, 10, 12, 15, 19, 21, 24};
+
+
+    int vertical_start = getY(subgrid) * 3; //0,1,2
+    int horizontal_start =  getX(subgrid) * 3; // 0,1,2
+
+
+    bool won = true;
+
+    // vertical
+    for (int i = vertical_start; i <= vertical_start + 2; i++) // y axis
     {
-        if (grid[i][1] == symbol && grid[i][5] == symbol && grid[i][9] == symbol)
+        if (grid[vertical[i]][horizontal[horizontal_start]] == symbol && grid[vertical[i]][horizontal[horizontal_start+1]] == symbol && grid[vertical[i]][horizontal[horizontal_start+2]] == symbol)
         {
             return true;
         }
     }
 
-    for (int i = 1; i <= 9; i += 4)
+    //horizontal
+    for (int i = horizontal_start; i <= horizontal_start + 2; i++) // x axis
     {
-        if (grid[1][i] == symbol && grid[3][i] == symbol && grid[5][i] == symbol)
+        if (grid[vertical[vertical_start]][horizontal[i]] == symbol && grid[vertical[vertical_start+1]][horizontal[i]] == symbol && grid[vertical[vertical_start+2]][horizontal[i]] == symbol)
         {
             return true;
         }
     }
-    
-    if ((grid[1][1] == symbol && grid[3][5] == symbol && grid[5][9] == symbol) ||
-        (grid[5][1] == symbol && grid[3][5] == symbol && grid[1][9] == symbol))   
+
+    // diagonal
+    if ((grid[vertical[vertical_start]][horizontal[horizontal_start]] == symbol && grid[vertical[vertical_start+1]][horizontal[horizontal_start+1]] == symbol && grid[vertical[vertical_start+2]][horizontal[horizontal_start+2]] == symbol) ||
+        (grid[vertical[vertical_start+2]][horizontal[horizontal_start]] == symbol && grid[vertical[vertical_start+1]][horizontal[horizontal_start+1]] == symbol && grid[vertical[vertical_start]][horizontal[horizontal_start+2]] == symbol))   
     {
         return true;
     }
@@ -143,26 +156,29 @@ bool checkWinG1(const vector<string> &grid, char symbol)
     return false;
 }
 
-bool checkWinG2(const vector<string> &grid, char symbol)
+bool checkWinFinal(char grid[3][3], char symbol)
 {
-    for (int i = 1; i <= 5; i += 2)
+    // vertical win
+    for (int i = 0; i <= 2; i += 1)
     {
-        if (grid[i][15] == symbol && grid[i][19] == symbol && grid[i][23] == symbol)
+        if (grid[i][0] == symbol && grid[i][1] == symbol && grid[i][2] == symbol)
         {
             return true;
         }
     }
 
-    for (int i = 15; i <= 23; i += 4)
+    //horizontal
+    for (int i = 0; i <= 2; i += 1)
     {
-        if (grid[1][i] == symbol && grid[3][i] == symbol && grid[5][i] == symbol)
+        if (grid[0][i] == symbol && grid[1][i] == symbol && grid[2][i] == symbol)
         {
             return true;
         }
     }
-    
-    if ((grid[1][15] == symbol && grid[3][19] == symbol && grid[5][23] == symbol) ||
-        (grid[5][15] == symbol && grid[3][19] == symbol && grid[1][23] == symbol))   
+
+    // diagonal
+    if ((grid[0][0] == symbol && grid[1][1] == symbol && grid[2][2] == symbol) ||
+        (grid[2][0] == symbol && grid[1][1] == symbol && grid[0][2] == symbol))   
     {
         return true;
     }
@@ -170,219 +186,6 @@ bool checkWinG2(const vector<string> &grid, char symbol)
     return false;
 }
 
-bool checkWinG3(const vector<string> &grid, char symbol)
-{
-    for (int i = 1; i <= 5; i += 2)
-    {
-        if (grid[i][29] == symbol && grid[i][33] == symbol && grid[i][37] == symbol)
-        {
-            return true;
-        }
-    }
-
-    for (int i = 29; i <= 37; i += 4)
-    {
-        if (grid[1][i] == symbol && grid[3][i] == symbol && grid[5][i] == symbol)
-        {
-            return true;
-        }
-    }
-    
-    if ((grid[1][29] == symbol && grid[3][33] == symbol && grid[5][37] == symbol) ||
-        (grid[5][37] == symbol && grid[3][33] == symbol && grid[1][29] == symbol))   
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool checkWinG4(const vector<string> &grid, char symbol)
-{
-    for (int i = 10; i <= 15; i += (i == 12 ? 3 : 2))
-    {
-        if (grid[i][1] == symbol && grid[i][5] == symbol && grid[i][9] == symbol)
-        {
-            return true;
-        }
-    }
-
-    for (int i = 1; i <= 9; i += 4)
-    {
-        if (grid[10][i] == symbol && grid[12][i] == symbol && grid[15][i] == symbol)
-        {
-            return true;
-        }
-    }
-    
-    if ((grid[10][1] == symbol && grid[12][5] == symbol && grid[15][9] == symbol) ||
-        (grid[15][1] == symbol && grid[12][5] == symbol && grid[10][9] == symbol))   
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool checkWinG5(const vector<string> &grid, char symbol)
-{
-    for (int i = 10; i <= 15; i += (i == 12 ? 3 : 2))
-    {
-        if (grid[i][15] == symbol && grid[i][19] == symbol && grid[i][23] == symbol)
-        {
-            return true;
-        }
-    }
-
-    for (int i = 15; i <= 23; i += 4)
-    {
-        if (grid[10][i] == symbol && grid[12][i] == symbol && grid[15][i] == symbol)
-        {
-            return true;
-        }
-    }
-    
-    if ((grid[10][15] == symbol && grid[12][19] == symbol && grid[15][23] == symbol) ||
-        (grid[15][15] == symbol && grid[12][19] == symbol && grid[10][23] == symbol))   
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool checkWinG6(const vector<string> &grid, char symbol)
-{
-    for (int i = 10; i <= 15; i += (i == 12 ? 3 : 2))
-    {
-        if (grid[i][29] == symbol && grid[i][33] == symbol && grid[i][37] == symbol)
-        {
-            return true;
-        }
-    }
-
-    for (int i = 29; i <= 37; i += 4)
-    {
-        if (grid[10][i] == symbol && grid[12][i] == symbol && grid[15][i] == symbol)
-        {
-            return true;
-        }
-    }
-    
-    if ((grid[10][29] == symbol && grid[12][33] == symbol && grid[15][37] == symbol) ||
-        (grid[15][37] == symbol && grid[12][33] == symbol && grid[10][29] == symbol))   
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool checkWinG7(const vector<string> &grid, char symbol)
-{
-    for (int i = 19; i <= 24; i += (i == 21 ? 3 : 2))
-    {
-        if (grid[i][1] == symbol && grid[i][5] == symbol && grid[i][9] == symbol)
-        {
-            return true;
-        }
-    }
-
-    for (int i = 1; i <= 9; i += 4)
-    {
-        if (grid[19][i] == symbol && grid[21][i] == symbol && grid[24][i] == symbol)
-        {
-            return true;
-        }
-    }
-    
-    if ((grid[19][1] == symbol && grid[21][5] == symbol && grid[24][9] == symbol) ||
-        (grid[24][1] == symbol && grid[21][5] == symbol && grid[19][9] == symbol))   
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool checkWinG8(const vector<string> &grid, char symbol)
-{
-    for (int i = 19; i <= 24; i += (i == 21 ? 3 : 2))
-    {
-        if (grid[i][15] == symbol && grid[i][19] == symbol && grid[i][23] == symbol)
-        {
-            return true;
-        }
-    }
-
-    for (int i = 15; i <= 23; i += 4)
-    {
-        if (grid[19][i] == symbol && grid[21][i] == symbol && grid[24][i] == symbol)
-        {
-            return true;
-        }
-    }
-    
-    if ((grid[19][15] == symbol && grid[21][19] == symbol && grid[24][23] == symbol) ||
-        (grid[24][15] == symbol && grid[21][19] == symbol && grid[19][23] == symbol))   
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool checkWinG9(const vector<string> &grid, char symbol)
-{
-    for (int i = 19; i <= 24; i += (i == 21 ? 3 : 2))
-    {
-        if (grid[i][29] == symbol && grid[i][33] == symbol && grid[i][37] == symbol)
-        {
-            return true;
-        }
-    }
-
-    for (int i = 29; i <= 37; i += 4)
-    {
-        if (grid[19][i] == symbol && grid[21][i] == symbol && grid[24][i] == symbol)
-        {
-            return true;
-        }
-    }
-    
-    if ((grid[19][29] == symbol && grid[21][33] == symbol && grid[24][37] == symbol) ||
-        (grid[24][37] == symbol && grid[21][33] == symbol && grid[19][29] == symbol))   
-    {
-        return true;
-    }
-
-    return false;
-}
-
-bool isGridWon(const vector<string> &grid, int gridNumber) {
-    switch (gridNumber) {
-        case 1:
-            return checkWinG1(grid, 'X') || checkWinG1(grid, 'O');
-        case 2:
-            return checkWinG2(grid, 'X') || checkWinG2(grid, 'O');
-        case 3:
-            return checkWinG3(grid, 'X') || checkWinG3(grid, 'O');
-        case 4:
-            return checkWinG4(grid, 'X') || checkWinG4(grid, 'O');
-        case 5:
-            return checkWinG5(grid, 'X') || checkWinG5(grid, 'O');
-        case 6:
-            return checkWinG6(grid, 'X') || checkWinG6(grid, 'O');
-        case 7:
-            return checkWinG7(grid, 'X') || checkWinG7(grid, 'O');
-        case 8:
-            return checkWinG8(grid, 'X') || checkWinG8(grid, 'O');
-        case 9:
-            return checkWinG9(grid, 'X') || checkWinG9(grid, 'O');
-        default:
-            return false;
-    }
-}
 
 int main() {
 
@@ -428,16 +231,29 @@ int main() {
 
     vector<vector<bool>> boxPlayed(9, vector<bool>(9, false));
 
+    char winnerArray[3][3] = {{'D', 'D', 'D'}, {'D', 'D', 'D'}, {'D', 'D', 'D'}};
+    int nextGrid = -1;
+
     while (true)
     {
         char currentPlayer = (moveCounter % 2 == 0) ? 'X' : 'O';
         
         cout << "Player " << currentPlayer << "'s turn." << endl;
-
         cout << endl;
+
+        if (nextGrid != -1)
+        {
+            cout << "Your move has to be in grid " << nextGrid << endl;
+        } 
+        
+        else
+        {
+            cout << "You can play in any grid." << endl;
+        }
+
         cout << "Enter your move (eg. 41): ";
         cin >> userInput;
-
+        
         int userCoordinate = userInput;
         int firstDigit = userCoordinate / 10;
         int secondDigit = userCoordinate % 10;
@@ -447,14 +263,14 @@ int main() {
 
         int selectedGrid = firstDigit;
 
-        if (isGridWon(vectorGrid, selectedGrid))
+        if (winnerArray[getY(selectedGrid)][getX(selectedGrid)] != 'D')
         {
             cout << "This grid has already been won. Choose another grid." << endl;
             skipSecondCondition = true;
             continue;
         }
 
-        if (!skipSecondCondition && prevSecondDigit != -1 && prevSecondDigit != outer)
+        if (nextGrid != -1 && firstDigit != nextGrid)
         {
             cout << "Invalid move. Your move must be in grid " << prevSecondDigit << endl;
             continue;
@@ -530,54 +346,34 @@ int main() {
         userRow--;
         userColumn--;
 
+        // play accepted
         vectorGrid[static_cast<int>(userRow * adjustedRowMultiplier + adjustedRow)][userColumn * adjustedColumnMultiplier + adjustedColumn] = symbol;
-
+        
         cout << endl;
         printGrid(vectorGrid);
 
-        if (checkWinG1(vectorGrid, symbol))
+        if (checkWin(vectorGrid, symbol, outer))
         {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
+            winnerArray[getY(selectedGrid)][getX(selectedGrid)] = symbol;
+            cout << "Player " << symbol << " wins grid " << outer << endl;
         }
 
-        if (checkWinG2(vectorGrid, symbol))
+        // check if player won the whole game:
+        if(checkWinFinal(winnerArray,symbol))
         {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
+            cout << "Player " << symbol << " has won the game!!!! GGWP!!.\n";
+            break;
         }
 
-        if (checkWinG3(vectorGrid, symbol))
+        if (winnerArray[getY(secondDigit)][getX(secondDigit)] == 'D')
         {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
-        }
-
-        if (checkWinG4(vectorGrid, symbol))
+            nextGrid = secondDigit;
+        } 
+        
+        else
         {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
-        }
-
-        if (checkWinG5(vectorGrid, symbol))
-        {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
-        }
-
-        if (checkWinG6(vectorGrid, symbol))
-        {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
-        }
-
-        if (checkWinG7(vectorGrid, symbol))
-        {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
-        }
-
-        if (checkWinG8(vectorGrid, symbol))
-        {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
-        }
-
-        if (checkWinG9(vectorGrid, symbol))
-        {
-            cout << "Player " << symbol << " wins the first grid!" << endl;
+            // the next grid has already been won
+            nextGrid = -1;
         }
 
         prevSecondDigit = inner;
@@ -585,5 +381,7 @@ int main() {
         moveCounter++;
     }
     
+    cout << "Thanks for playing." << endl;
+
     return 0;
 }
