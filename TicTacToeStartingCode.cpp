@@ -1,13 +1,30 @@
 #include <iostream>
-#include <string>
 #include <vector>
 using namespace std;
 
-void printGrid(const vector<string> &grid) 
+void printGrid(const vector<string> &grid)
 {
-    for (const string &row : grid) 
+    for (const string &row : grid)
     {
-        cout << row << endl;
+        for (char c : row)
+        {
+            if (c == 'X') 
+            {
+                cout << "\x1b[31m" << c << "\x1b[0m"; 
+            }
+
+            else if (c == 'O') 
+            {    
+                cout << "\x1b[34m" << c << "\x1b[0m"; 
+            } 
+            
+            else 
+            {
+                cout << c;
+            }
+        }
+        
+        cout << endl;
     }
 }
 
@@ -50,8 +67,6 @@ int getX (int n)
 
 int getActualX(int outer, int inner)
 {
-    //partially solved (for first row only)
-    //REMEMBER
     // 2 -> 6
     // 0 -> 0
     // 1 -> 3
@@ -89,7 +104,7 @@ int getActualX(int outer, int inner)
 int getActualY(int outer, int inner)
 {
     int ref, y = 0;
-    // cout << getY(outer);
+    
     switch (getY(outer)) {
         case 0:
             ref = 1;
@@ -116,15 +131,14 @@ int getActualY(int outer, int inner)
 
     return y;
 }
+
 bool checkWin(const vector<string> &grid, char symbol, int subgrid)
 {
     int horizontal[9] = {1, 5, 9, 15, 19, 23, 29, 33, 37};
     int vertical[9] = {1, 3, 5, 10, 12, 15, 19, 21, 24};
 
-
     int vertical_start = getY(subgrid) * 3; //0,1,2
     int horizontal_start =  getX(subgrid) * 3; // 0,1,2
-
 
     bool won = true;
 
@@ -167,7 +181,7 @@ bool checkWinFinal(char grid[3][3], char symbol)
         }
     }
 
-    //horizontal
+    // horizontal
     for (int i = 0; i <= 2; i += 1)
     {
         if (grid[0][i] == symbol && grid[1][i] == symbol && grid[2][i] == symbol)
@@ -261,11 +275,17 @@ int main() {
         inner = secondDigit;
         outer = firstDigit;
 
+        if (firstDigit == 0 || secondDigit == 0 || userInput > 99 || userInput < 11) 
+        {
+            cout << "The coordinate you entered is out of range. Please enter the right coordinate. " << endl;
+            continue;
+        }
+
         int selectedGrid = firstDigit;
 
         if (winnerArray[getY(selectedGrid)][getX(selectedGrid)] != 'D')
         {
-            cout << "This grid has already been won. Choose another grid." << endl;
+            cout << "This grid has already been drawn or won. Choose another grid." << endl;
             skipSecondCondition = true;
             continue;
         }
@@ -277,12 +297,6 @@ int main() {
         }
 
         skipSecondCondition = false;
-
-        if (firstDigit == 0 || secondDigit == 0 || userInput > 99 || userInput < 11) 
-        {
-            cout << "The coordinate you entered is out of range. Please enter the right coordinate. " << endl;
-            continue;
-        }
 
         if (moveCounter % 2 == 0) 
         {
@@ -358,18 +372,65 @@ int main() {
             cout << "Player " << symbol << " wins grid " << outer << endl;
         }
 
+        bool currentGridFullyPlayed = true;
+        
+        for (int i = 0; i < 9; ++i) 
+        {
+            int y = getY(outer) * 3 + i / 3;
+            int x = getX(outer) * 3 + i % 3;
+            
+            if (!boxPlayed[y][x]) 
+            {
+                currentGridFullyPlayed = false;
+                break;
+            }
+        }
+
+        // check for a draw in the current grid
+        if (currentGridFullyPlayed) 
+        {
+            if (!checkWin(vectorGrid, 'X', outer) && !checkWin(vectorGrid, 'O', outer)) 
+            {
+                cout << "Grid " << outer << " is a draw!" << endl;
+
+                winnerArray[getY(outer)][getX(outer)] = 'A';
+            }
+        }
+
+        bool allGridsFilled = true;
+
+        for (int i = 0; i < 9; ++i) 
+        {
+            if (winnerArray[i / 3][i % 3] == 'D') 
+            {
+                allGridsFilled = false;
+                break;
+            }
+        }
+
+        if (allGridsFilled && !checkWinFinal(winnerArray, 'X') && !checkWinFinal(winnerArray, 'O')) 
+        {
+            cout << "The game is a draw!" << endl;
+            break; // End the game
+        }
+
         // check if player won the whole game:
-        if(checkWinFinal(winnerArray,symbol))
+        if (checkWinFinal(winnerArray, symbol))
         {
             cout << "Player " << symbol << " has won the game!!!! GGWP!!.\n";
             break;
         }
 
+        if (winnerArray[getY(outer)][getX(outer)] == 'A')
+        {
+            nextGrid = -1;
+        }
+
         if (winnerArray[getY(secondDigit)][getX(secondDigit)] == 'D')
         {
             nextGrid = secondDigit;
-        } 
-        
+        }
+    
         else
         {
             // the next grid has already been won
