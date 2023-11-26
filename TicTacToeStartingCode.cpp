@@ -500,6 +500,7 @@ int main() {
     }
     
     cout << "\nThanks for playing." << endl;
+    cout << endl;
 
     return 0;
 }
