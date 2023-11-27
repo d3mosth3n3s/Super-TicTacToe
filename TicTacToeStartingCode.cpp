@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <sstream>
+#include <cctype>
+#include <limits>
 using namespace std;
 
 void printGrid(const vector<string> &grid)
@@ -45,6 +48,7 @@ int getY (int n)
         return 2;
     }
 
+    return -1;
 }
 
 int getX (int n)
@@ -63,6 +67,8 @@ int getX (int n)
         case 2:
             return 1;
     }
+
+    return -1;
 }
 
 int getActualX(int outer, int inner)
@@ -89,7 +95,6 @@ int getActualX(int outer, int inner)
 
     if (inner > 6)
     {
-        // cout << inner << " is more than 6 \n";
         x -= 6;
     } 
     
@@ -200,6 +205,49 @@ bool checkWinFinal(char grid[3][3], char symbol)
     return false;
 }
 
+void clearConsole() 
+{
+    for (int i = 0; i < 100; ++i) 
+    {
+        cout << endl;
+    }
+}
+
+int getUserInput() 
+{
+    string userInput;
+    while (true) 
+    {
+        cout << "\nEnter your move (eg. 41): ";
+        cin >> userInput;
+
+        bool validInput = true;
+        
+        for (char c : userInput) 
+        {
+            if (!isdigit(c)) 
+            {
+                validInput = false;
+                break;
+            }
+        }
+
+        if (validInput) 
+        {
+            stringstream ss(userInput);
+            int move;
+            if (ss >> move) 
+            {
+                return move;
+            }
+        }
+
+        cout << "\nInvalid input. Please enter a valid coordinate." << endl;
+        cout << "______________________________________________________" << endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+}
 
 int main() {
 
@@ -252,21 +300,21 @@ int main() {
     {
         char currentPlayer = (moveCounter % 2 == 0) ? 'X' : 'O';
         
-        cout << "Player " << currentPlayer << "'s turn." << endl;
+        cout << "______________________________________________________" << endl;
+        cout << "\nPlayer " << currentPlayer << "'s turn.";
         cout << endl;
 
         if (nextGrid != -1)
         {
-            cout << "Your move has to be in grid " << nextGrid << endl;
+            cout << "\nYour move has to be in grid " << nextGrid << endl;
         } 
         
         else
         {
-            cout << "You can play in any grid." << endl;
+            cout << "\nYou can play in any grid." << endl;
         }
 
-        cout << "Enter your move (eg. 41): ";
-        cin >> userInput;
+        int userInput = getUserInput();
         
         int userCoordinate = userInput;
         int firstDigit = userCoordinate / 10;
@@ -277,7 +325,8 @@ int main() {
 
         if (firstDigit == 0 || secondDigit == 0 || userInput > 99 || userInput < 11) 
         {
-            cout << "The coordinate you entered is out of range. Please enter the right coordinate. " << endl;
+            cout << "\nThe coordinate you entered is out of range. Please enter the right coordinate. " << endl;
+            cout << "______________________________________________________" << endl;
             continue;
         }
 
@@ -285,14 +334,16 @@ int main() {
 
         if (winnerArray[getY(selectedGrid)][getX(selectedGrid)] != 'D')
         {
-            cout << "This grid has already been drawn or won. Choose another grid." << endl;
+            cout << "\nThis grid has already been drawn or won. Choose another grid." << endl;
+            cout << "______________________________________________________" << endl;
             skipSecondCondition = true;
             continue;
         }
 
         if (nextGrid != -1 && firstDigit != nextGrid)
         {
-            cout << "Invalid move. Your move must be in grid " << prevSecondDigit << endl;
+            cout << "\nInvalid move. Your move must be in grid " << prevSecondDigit << endl;
+            cout << "______________________________________________________" << endl;
             continue;
         }
 
@@ -313,7 +364,8 @@ int main() {
 
         if (boxPlayed[userRow - 1][userColumn - 1]) 
         {
-            cout << "This box has already been played in. Play in another box." << endl;
+            cout << "\nThis box has already been played in. Play in another box." << endl;
+            cout << "______________________________________________________" << endl;
             continue;
         }
 
@@ -364,12 +416,14 @@ int main() {
         vectorGrid[static_cast<int>(userRow * adjustedRowMultiplier + adjustedRow)][userColumn * adjustedColumnMultiplier + adjustedColumn] = symbol;
         
         cout << endl;
+        clearConsole();
         printGrid(vectorGrid);
 
         if (checkWin(vectorGrid, symbol, outer))
         {
             winnerArray[getY(selectedGrid)][getX(selectedGrid)] = symbol;
-            cout << "Player " << symbol << " wins grid " << outer << endl;
+            cout << "\nPlayer " << symbol << " wins grid " << outer << endl;
+            cout << "______________________________________________________" << endl;
         }
 
         bool currentGridFullyPlayed = true;
@@ -391,7 +445,8 @@ int main() {
         {
             if (!checkWin(vectorGrid, 'X', outer) && !checkWin(vectorGrid, 'O', outer)) 
             {
-                cout << "Grid " << outer << " is a draw!" << endl;
+                cout << "\nGrid " << outer << " is a draw!" << endl;
+                cout << "______________________________________________________" << endl;
 
                 winnerArray[getY(outer)][getX(outer)] = 'A';
             }
@@ -410,14 +465,16 @@ int main() {
 
         if (allGridsFilled && !checkWinFinal(winnerArray, 'X') && !checkWinFinal(winnerArray, 'O')) 
         {
-            cout << "The game is a draw!" << endl;
+            cout << "\nThe game is a draw!" << endl;
+            cout << "______________________________________________________" << endl;
             break; // End the game
         }
 
         // check if player won the whole game:
         if (checkWinFinal(winnerArray, symbol))
         {
-            cout << "Player " << symbol << " has won the game!!!! GGWP!!.\n";
+            cout << "\nPlayer " << symbol << " has won the game!!!! GGWP!!.\n";
+            cout << "______________________________________________________" << endl;
             break;
         }
 
@@ -430,7 +487,7 @@ int main() {
         {
             nextGrid = secondDigit;
         }
-    
+
         else
         {
             // the next grid has already been won
@@ -442,7 +499,8 @@ int main() {
         moveCounter++;
     }
     
-    cout << "Thanks for playing." << endl;
+    cout << "\nThanks for playing." << endl;
+    cout << endl;
 
     return 0;
 }
